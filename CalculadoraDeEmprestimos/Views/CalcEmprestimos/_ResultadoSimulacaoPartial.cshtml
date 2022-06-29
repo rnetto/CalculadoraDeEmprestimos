@@ -1,0 +1,89 @@
+﻿
+@model SimulacaoUsuario
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="box">
+                <div class="prazo-pretendido">
+                    <div class="box-desc">
+                        <h2 class="title-page">
+                            <img src="images/calendar.svg" alt="">
+                            Prazo pretendido
+                        </h2>
+                        <div id="teste" value="@Model.QtdParcelas"></div>
+                      
+                        <div class="box-number orange">
+                            <input type="text" class="number" id="valor-pretendido" value="@Model.QtdParcelas">
+                        </div>
+
+                        <div class="valor">
+                           
+                            <div class="box-number orange">
+                                <input type="text" class="number" id="valorTotal" data-mask="money" value="@Model.ValorSimulado">
+                            </div>
+
+                            <div class="box-calc">
+                                
+                                <input type="text" class="number" id="qtdParc" value="@Model.QtdParcelas">
+                               
+                                <input type="text" class="number" id="valorParc" data-mask="money" value="@Model.ValorParcelas">
+                            </div>
+                            <div>
+                                <input type="text" class="number" id="porcentagemPretendida" data-mask="money" value="@Model.CustoEfetivoMensal">
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="box-interesse">
+                        <img src="images/interesse.svg" alt="" class="icon">
+
+                        <h2 class="title-page">Confirme aqui seu interesse</h2>
+
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="interesse" id="sim" value="sim" onclick="SalvarSimulacao()">
+                            <label class="custom-control-label" for="sim">Sim, estou interessado</label>
+                        </div>
+
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" name="interesse" id="nao" value="nao" onclick="VoltarIndex()">
+                            <label class="custom-control-label" for="nao">Não tenho interesse</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+
+    function SalvarSimulacao() {
+        var teste = parseFloat("$('#valorTotal').val()");
+        console.log(teste);
+        $.ajax({
+            url: '@Url.Action("SalvarSimulacao", "CalcEmprestimos")',
+            type: 'POST',
+            data: {
+                "ValorPretendido": $("#valor-pretendido").val(),
+                "ValorSimulado": teste,
+                "QtdParcelas": $("#qtdParc").val(),
+                "ValorParcelas": $("#valorParc").val(),
+                "CustoEfetivoMensal": $("#porcentagemPretendida").val()
+            },
+            success: function (response) {
+            window.location.href = '@Url.Action("Index", "Home")';
+            },
+            error: function (error) {
+                error.statusText;
+            }
+        });
+    }
+
+    function VoltarIndex() {
+
+        window.location.href = '@Url.Action("Index", "Home")';
+    }
+</script>

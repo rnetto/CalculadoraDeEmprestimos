@@ -1,4 +1,5 @@
-﻿@model BaseCalcViewModel
+﻿
+@model BaseCalcViewModel
 @{
     ViewData["Title"] = "Calculadora de Empréstimos";
 }
@@ -133,48 +134,8 @@
                                 </label>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="prazo-pretendido" style="display:none">
-                        <div class="box-desc">
-                            <h2 class="title-page">
-                                <img src="images/calendar.svg" alt="">
-                                Prazo pretendido
-                            </h2>
-
-                            <div class="mes">
-                                <span class="num" value="" id="qtdMes"></span>/Meses
-                            </div>
-
-                            <div class="valor">
-                                <div class="box-num green">
-                                    <span class="number" id="valor-total" value=""></span>
-                                </div>
-                                <div class="box-calc">
-                                    <span class="number" id="qtdParc" value=""></span>
-                                    <span class="number" id="valor-Parc" value=""></span>
-                                </div>
-                                <div class="box-num orange">
-                                    <span class="number" id="porcentagemPretendida" value=""></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="box-interesse">
-                            <img src="images/interesse.svg" alt="" class="icon">
-
-                            <h2 class="title-page">Confirme aqui seu interesse</h2>
-
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="interesse" id="sim" value="sim">
-                                <label class="custom-control-label" for="sim">Sim, estou interessado</label>
-                            </div>
-
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" name="interesse" id="nao" value="nao">
-                                <label class="custom-control-label" for="nao">Não tenho interesse</label>
-                            </div>
-                        </div>
-                    </div>
+                    </div>                    
+                    <div id="PartView"></div>
 
                     <div class="custo-efetivo">
                         <h2 class="title-page">Composição do custo efetivo</h2>
@@ -207,72 +168,63 @@
     </div>
 </main>
 
-<script>
-    $(document).ready(function () {
-        $('input:radio[name="interesse"]').change(SalvarSimulacao($(this).val()));
-        $('input:radio[name="prazo-mes"]').change(CalculaValor());
-    });
-
-    function SalvarSimulacao(e) {
-        if (e == 'sim') {
-            AjaxRequest({
-                url: '@Url.Action("SalvarSimulacao", "CalcEmprestimos")',
-                type: 'POST',
-                data: {
-                    "ValorPretendido": $("#valor-pretendido").val(),
-                    "ValorSimulado": $("#valor-total").val(),
-                    "QtdParcelas": $("#qtdParc").val(),
-                    "ValorParcelas": $("#valor-Parc").val(),
-                },
-                success: function (response) {
-                    Notify("success", 'Simulação armazenada com sucesso!');
-                    window.location.href = '@Url.Action("Index", "Home")';
-                },
-                error: function (error) {
-                    Notify("danger", error.statusText);
-                }
-            });
-        }
-        else 
-             window.location.href = '@Url.Action("Index", "Home")';
-    }
+<script type="text/javascript">
 
     function CalculaValor() {
         var prazoMes = document.querySelector('input[name="prazo-mes"]:checked').value;
-        var taxa;
+        let taxa;
+
         if (prazoMes == 6)
-            taxa = 2.8;
+            taxa = 28;
         else if (prazoMes == 12)
-            taxa = 1.9;
+            taxa = 19;
         else if (prazoMes == 24)
-            taxa = 1.85;
-        else
-            taxa = 1.64;
+            taxa = 185;
+        else if (prazoMes == 36)
+            taxa = 164;
 
-        AjaxRequest({
-             url: '@Url.Action("CalculaValor", "CalcEmprestimos")',
-             type: 'POST',
-             dataType: 'JSON',
-             data: {
-                 "ValorPretendido": $("#valor-pretendido").val(),
-                 "qtdMes": prazoMes,
-                 "taxaMensal": taxa
-             },
-             success: function (response) {
-                 Notify("success", 'Simulação realizada!');
+        if (taxa == 0) {
+            prazoMes = 6;
+            CalculaValor();
+        }
+        else {
+            $.ajax({
+                url: '@Url.Action("CalculaValor", "CalcEmprestimos")',
+                type: 'POST',
+                data: {
+                    "ValorPretendido": $("#valor-pretendido").val(),
+                    "qtdMes": prazoMes,
+                    "taxaMensal": taxa
+                },
+                success: function (response) {
+                    $("#PartView").html(response)
+                },
+                error: function (error) {
+                    window.location.href = '@Url.Action("Index", "Home")';
+                }
+            });
+        }
+    }
+    function SalvarSimulacao() {
+        var teste = '@Model.ValorMinimo';
+        console.log(teste);
 
-                 $("#valor-total").html(response.ValorSimulado);
-                 $("#qtdMes").html(response.QtdParcelas);
-                 $("#qtdParc").html(response.QtdParcelas);
-                 $("#valor-Parc").html(response.ValorParcelas);
-                 $("#porcentagemPretendida").html(response.CustoEfetivoMensal);
-                 
-                 document.getElementsByClassName('prazo-pretendido').style.display = 'block';
-             },
-             error: function (error) {
-                 Notify("danger", error.statusText);
-             }
+        $.ajax({
+            url: '@Url.Action("SalvarSimulacao", "CalcEmprestimos")',
+            type: 'POST',
+            data: {
+                "ValorPretendido": $("#valor-pretendido").val(),
+                "ValorSimulado": $("#valorTotal").val(),
+                "QtdParcelas": $("#qtdParc").val(),
+                "ValorParcelas": $("#valorParc").val(),
+                "CustoEfetivoMensal": $("#porcentagemPretendida").val()
+            },
+            success: function (response) {
+            window.location.href = '@Url.Action("Index", "Home")';
+            },
+            error: function (error) {
+                error.statusText;
+            }
         });
     }
-
 </script>

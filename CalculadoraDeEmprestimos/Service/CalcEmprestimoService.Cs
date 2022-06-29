@@ -1,9 +1,6 @@
 ﻿using CalculadoraDeEmprestimos.Data;
 using CalculadoraDeEmprestimos.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CalculadoraDeEmprestimos.Service
 {
@@ -18,22 +15,23 @@ namespace CalculadoraDeEmprestimos.Service
 
         public BaseCalcViewModel GetSaldos(string usuarioId)
         {
-            var BaseCalcViewModel = from bcvm in _context.DadosUsuario
+            var BaseCalcViewModel = (from bcvm in _context.DadosUsuario
                                     where bcvm.UserId == usuarioId
                                     select new BaseCalcViewModel()
                                     {
                                         ValorMinimo = bcvm.ValorMinimo,
-                                        LimiteCredTotal6 = bcvm.LimiteCredTotal6,
-                                        ValorParcelaCred6 = CalcParcela(6, bcvm.LimiteCredTotal6),
+                                        LimiteCredTotal6 = bcvm.LimiteCredTotal6,                                        
                                         LimiteCredTotal12 = bcvm.LimiteCredTotal12,
-                                        ValorParcelaCred12 = CalcParcela(12, bcvm.LimiteCredTotal12),
                                         LimiteCredTotal24 = bcvm.LimiteCredTotal24,
-                                        ValorParcelaCred24 = CalcParcela(24, bcvm.LimiteCredTotal24),
                                         LimiteCredTotal36 = bcvm.LimiteCredTotal36,
-                                        ValorParcelaCred36 = CalcParcela(36, bcvm.LimiteCredTotal36),
-                                    };
+                                    }).ToList().FirstOrDefault();
 
-            return BaseCalcViewModel.FirstOrDefault();
+            BaseCalcViewModel.ValorParcelaCred6 = CalcParcela(6, BaseCalcViewModel.LimiteCredTotal6);
+            BaseCalcViewModel.LimiteCredTotal12 = CalcParcela(12, BaseCalcViewModel.LimiteCredTotal12);
+            BaseCalcViewModel.ValorParcelaCred24 = CalcParcela(24, BaseCalcViewModel.LimiteCredTotal24);
+            BaseCalcViewModel.ValorParcelaCred36 = CalcParcela(36, BaseCalcViewModel.LimiteCredTotal36);
+
+            return BaseCalcViewModel;
         }
 
         public SimulacaoUsuario GetSimulacaoCalc(int qtdMes ,decimal ValorPretendido, decimal taxaMensal)
@@ -49,7 +47,7 @@ namespace CalculadoraDeEmprestimos.Service
         }
         public decimal CalcJuros(int mes, decimal valorPretendido, decimal taxaMensal)
         {            
-            return (mes * taxaMensal) * valorPretendido;
+            return (mes * (taxaMensal/100)) * valorPretendido + valorPretendido;
         }
 
         public decimal CalcParcela(int mes, decimal ValorSimuladoTotal)
