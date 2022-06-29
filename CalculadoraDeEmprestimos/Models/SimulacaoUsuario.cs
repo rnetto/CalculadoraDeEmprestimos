@@ -7,6 +7,7 @@ namespace CalculadoraDeEmprestimos.Models
 {
     public class SimulacaoUsuario
     {
+        public int Id { get; set; }
         public string UserId { get; set; }        
         public decimal ValorPretendido { get; set; }
         public decimal ValorSimulado { get; set; }
