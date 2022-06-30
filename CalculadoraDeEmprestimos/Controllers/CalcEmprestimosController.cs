@@ -66,11 +66,11 @@ namespace CalculadoraDeEmprestimos.Controllers
                
                 _calcEmprestimoService.PostSimulacaoCalc(simulacaoUsuario);
 
-                return Ok();
+                return Ok("<h1><font color='green'> Simulação salva com sucesso! </font></h1>");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.Message);
             }
         }
     }

@@ -11,25 +11,26 @@
                             <img src="images/calendar.svg" alt="">
                             Prazo pretendido
                         </h2>
-                        <div id="teste" value="@Model.QtdParcelas"></div>
-                      
+                                              
                         <div class="box-number orange">
-                            <input type="text" class="number" id="valor-pretendido" value="@Model.QtdParcelas">
+                            <input type="text" class="number" id="meses" value="@Model.QtdParcelas" disabled>
+                            <label for="meses">/MESES</label>
                         </div>
 
-                        <div class="valor">
-                           
+                        <div class="valor">                           
                             <div class="box-number orange">
-                                <input type="text" class="number" id="valorTotal" data-mask="money" value="@Model.ValorSimulado">
+                                <label for="valorTotal">Valor total à pagar</label>
+                                <input type="text" class="number" id="valorTotal" data-mask="money" value="@Model.ValorSimulado" disabled>
                             </div>
 
-                            <div class="box-calc">
-                                
-                                <input type="text" class="number" id="qtdParc" value="@Model.QtdParcelas">
-                               
-                                <input type="text" class="number" id="valorParc" data-mask="money" value="@Model.ValorParcelas">
+                            <div class="box-number orange">
+                                <label for="qtdParc">Quantidade de parcelas</label>
+                                <input type="text" class="number" id="qtdParc" value="@Model.QtdParcelas" disabled>
+                                <label for="valorParc">Valor parcela mansal </label>
+                                <input type="text" class="number" id="valorParc" data-mask="money" value="@Model.ValorParcelas" disabled>
                             </div>
-                            <div>
+                            <div class="box-number orange">
+                                <label for="porcentagemPretendida">Custo juros mensal </label>
                                 <input type="text" class="number" id="porcentagemPretendida" data-mask="money" value="@Model.CustoEfetivoMensal">
                             </div>
 
@@ -61,29 +62,29 @@
 
 
     function SalvarSimulacao() {
-        var teste = parseFloat("$('#valorTotal').val()");
-        console.log(teste);
+
         $.ajax({
             url: '@Url.Action("SalvarSimulacao", "CalcEmprestimos")',
             type: 'POST',
             data: {
                 "ValorPretendido": $("#valor-pretendido").val(),
-                "ValorSimulado": teste,
+                "ValorSimulado": $("#valorTotal").val(),
                 "QtdParcelas": $("#qtdParc").val(),
                 "ValorParcelas": $("#valorParc").val(),
                 "CustoEfetivoMensal": $("#porcentagemPretendida").val()
             },
             success: function (response) {
-            window.location.href = '@Url.Action("Index", "Home")';
+                $("#PartView").html(response);
             },
             error: function (error) {
-                error.statusText;
+                $("#AlertView").html("<h1><font color='red'>Ocorreu um erro! </font></h1>");
+                setTimeout(function () { window.location.href = '@Url.Action("Index", "Home")'; }, 3000);
             }
         });
     }
 
     function VoltarIndex() {
-
-        window.location.href = '@Url.Action("Index", "Home")';
+        $("#AlertView").html("<h1><font color='red'>Simulação descartada. voltando a Index</font></h1>");
+        setTimeout(function () { window.location.href = '@Url.Action("Index", "Home")'; }, 3000);
     }
 </script>

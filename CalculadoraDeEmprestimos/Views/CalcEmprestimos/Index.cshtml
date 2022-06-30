@@ -137,6 +137,8 @@
                     </div>                    
                     <div id="PartView"></div>
 
+                    <div id="AlertView"></div>
+
                     <div class="custo-efetivo">
                         <h2 class="title-page">Composição do custo efetivo</h2>
 
@@ -200,31 +202,11 @@
                     $("#PartView").html(response)
                 },
                 error: function (error) {
-                    window.location.href = '@Url.Action("Index", "Home")';
+                    $("#AlertView").html("<h1><font color='red'>Ocorreu um erro! </font></h1>");
+                setTimeout(function () { window.location.href = '@Url.Action("Index", "Home")'; }, 3000);
                 }
             });
         }
     }
-    function SalvarSimulacao() {
-        var teste = '@Model.ValorMinimo';
-        console.log(teste);
 
-        $.ajax({
-            url: '@Url.Action("SalvarSimulacao", "CalcEmprestimos")',
-            type: 'POST',
-            data: {
-                "ValorPretendido": $("#valor-pretendido").val(),
-                "ValorSimulado": $("#valorTotal").val(),
-                "QtdParcelas": $("#qtdParc").val(),
-                "ValorParcelas": $("#valorParc").val(),
-                "CustoEfetivoMensal": $("#porcentagemPretendida").val()
-            },
-            success: function (response) {
-            window.location.href = '@Url.Action("Index", "Home")';
-            },
-            error: function (error) {
-                error.statusText;
-            }
-        });
-    }
 </script>
